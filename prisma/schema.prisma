@@ -1,0 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  // previewFeatures = ["prismaSchemaFolder"]
+  previewFeatures = ["omitApi"]
+}
+
+model Attendence {
+  id           Int             @id @default(autoincrement())
+  location     String
+  date         String
+  checkInTime  DateTime
+  checkOutTime DateTime?
+  checkIn      AttendenceType
+  checkOut     AttendenceType?
+  userID       Int
+  user         Users           @relation(fields: [userID], references: [id])
+}
+
+enum AttendenceType {
+  EARLY
+  LATE
+  ONTIME
+}
+
+model Office {
+  id        Int      @id @default(autoincrement())
+  name      String
+  start     DateTime
+  end       DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Leaves {
+  id          Int              @id @default(autoincrement())
+  type        LeavesType       @default(CASUAL)
+  status      LeaveStatus      @default(PENDING)
+  adminStatus LeaveAdminStatus @default(PENDING)
+  reason      String           @db.VarChar(250)
+  file        String?
+  noteHead    String?
+  noteAdmin   String?
+  dayStart    DateTime
+  dayEnd      DateTime
+  dayCount    Int
+  leaveDays   Int
+  applicantID Int
+  applicant   Users            @relation(fields: [applicantID], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+enum LeaveStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum LeaveAdminStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum LeavesType {
+  SICK
+  CASUAL
+  ANNUAL
+}
+
+model Task {
+  id         Int      @id @default(autoincrement())
+  name       String
+  start      DateTime
+  due        DateTime
+  priority   Priority @default(LOW)
+  status     Status   @default(TODO)
+  assignedTo Int
+  user       Users    @relation(fields: [assignedTo], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum Status {
+  TODO
+  INPROGRESS
+  COMPLETED
+}
+
+model Team {
+  id         Int      @id @default(autoincrement())
+  name       String
+  teamheadID Int
+  teamhead   Users    @relation("teamhead", fields: [teamheadID], references: [id])
+  members    Users[]  @relation("members")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+enum ROLES {
+  ADMIN
+  EMPLOYEE
+  TEAMLEADER
+}
+
+model Users {
+  id            Int          @id @default(autoincrement())
+  name          String
+  email         String       @unique
+  password      String
+  address       String
+  phone         String       @db.VarChar(11)
+  position      String
+  role          ROLES        @default(EMPLOYEE)
+  image         String?
+  emailVerified Boolean      @default(false)
+  Attendence    Attendence[]
+  teamhead      Team[]       @relation("teamhead")
+  Team          Team[]       @relation("members")
+  Task          Task[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  Leaves        Leaves[]
+}
