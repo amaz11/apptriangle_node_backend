@@ -62,6 +62,21 @@ exports.getAllUsers = async (req, res) => {
     });
 };
 
+exports.getAllUser = async (req, res) => {
+    const users = await prisma.users.findMany({
+        omit: {
+            password: true
+        }
+    });
+
+    res.status(200).json({
+        ok: true,
+        message: 'success',
+        data: users,
+
+    });
+};
+
 exports.getUser = async (req, res) => {
     const { id } = req.params;
 

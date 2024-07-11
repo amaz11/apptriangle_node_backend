@@ -8,7 +8,7 @@ exports.createTeam = async (req, res) => {
             name,
             teamheadID: +teamheadID,
             members: {
-                connect: memberIDs.map(id => ({ id: +id }))
+                connect: memberIDs.map(id => ({ id: +id.id }))
             }
         }
     })
