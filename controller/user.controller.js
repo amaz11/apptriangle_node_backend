@@ -66,7 +66,22 @@ exports.getUser = async (req, res) => {
     const { id } = req.params;
 
     const user = await prisma.users.findUniqueOrThrow({
-        where: { id: +id }
+        where: { id: +id },
+        omit: { password: true }
+    });
+
+    res.status(200).json({
+        ok: true,
+        message: 'success',
+        data: user
+    });
+};
+
+exports.getProfile = async (req, res) => {
+    const { id } = req.user;
+    const user = await prisma.users.findUniqueOrThrow({
+        where: { id: +id },
+        omit: { password: true }
     });
 
     res.status(200).json({

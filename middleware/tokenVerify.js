@@ -65,7 +65,7 @@ exports.commonVerify = async (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (decoded.role === 'TEAMLEADER' || decoded.role === "'EMPLOYEE'") {
+        if (decoded.role === 'TEAMLEADER' || decoded.role === "EMPLOYEE") {
             req.user = decoded;
             next();
         }
@@ -76,4 +76,23 @@ exports.commonVerify = async (req, res, next) => {
         res.status(401).json({ message: 'Token is not valid', ok: false });
     }
 };
+
+exports.allUserVerify = async (req, res, next) => {
+    const token = req.headers.authorization?.split("Bearer ")[1];
+    if (!token) return next(new ErrorHandler("No token, authorization denied", 401));
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.role === 'TEAMLEADER' || decoded.role === "EMPLOYEE" || decoded.role === "ADMIN") {
+            req.user = decoded;
+            next();
+        }
+        else {
+            return next(new ErrorHandler("Authorization denied", 401));
+        }
+    } catch (error) {
+        res.status(401).json({ message: 'Token is not valid', ok: false });
+    }
+};
+
 

@@ -4,7 +4,7 @@ const { createAttendence, getAllAttendences, getALLAttendenceByEmployee, updateA
 const { commonVerify, adminVerify } = require('../middleware/tokenVerify');
 const router = express.Router();
 
-router.post('/', commonVerify, createAttendence);
+router.post('/', commonVerify, asyncHandler(createAttendence));
 router.get('/admin/', adminVerify, asyncHandler(getAllAttendences));
 router.get('/employee/', commonVerify, asyncHandler(getALLAttendenceByEmployee));
 router.get("/user/today/attendence", commonVerify, asyncHandler(TodayAttendence));
