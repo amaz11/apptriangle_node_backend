@@ -62,6 +62,7 @@ exports.createAttendence = async (req, res) => {
     const checkIn = checkInType(checkInTime);
     const attendence = await prisma.attendence.create({
         data: {
+            isCheckIn: true,
             location,
             date,
             checkInTime,
@@ -82,11 +83,12 @@ exports.createAttendence = async (req, res) => {
 exports.TodayAttendence = async (req, res) => {
     const { id } = req.user
     let date = new Date().toISOString().split('T')[0];
-    let day = date.getDate();
-    const attendece = await prisma.attendence.findUnique({
+    const attendece = await prisma.attendence.findMany({
         where: {
-            userID: +id,
-            date: day
+            AND: [
+                { userID: +id, },
+                { date }
+            ]
         }
     })
     res.status(200).json({ message: "success", ok: true, data: attendece })
@@ -147,7 +149,8 @@ exports.updateAttendence = async (req, res, next) => {
             },
             data: {
                 checkOutTime: checkOutTime,
-                checkOut: checkOut
+                checkOut: checkOut,
+                isCheckOut: true
             }
         });
         return res.status(200).json({

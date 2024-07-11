@@ -20,11 +20,15 @@ model Attendence {
   location     String
   date         String
   checkInTime  DateTime
+  isCheckIn    Boolean         @default(false)
+  isCheckOut   Boolean         @default(false)
   checkOutTime DateTime?
   checkIn      AttendenceType
   checkOut     AttendenceType?
   userID       Int
   user         Users           @relation(fields: [userID], references: [id])
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 }
 
 enum AttendenceType {
